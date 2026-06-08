@@ -397,6 +397,11 @@ function editBudget(idx) {
     .getElementById('budget-modal')
     .classList.add('open');
 }
+function closeBudgetActionModal() {
+  document
+    .getElementById('budget-action-modal')
+    .classList.remove('open');
+}
 
 function openBudgetModal() {
   const sel = document.getElementById('budget-cat');
