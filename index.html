@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Takaro - Kelola Keuanganmu</title>
+  <meta name="description" content="Takaro adalah aplikasi manajemen keuangan pribadi untuk mahasiswa dan pekerja muda. Catat pemasukan, pengeluaran, dan rencanakan keuanganmu secara terukur." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#1C3A6E" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Takaro" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- App Shell -->
+  <div class="phone-wrapper">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+
+      <!-- ===== SCREEN: INTRO (ANIMATED SPLASH) ===== -->
+      <div class="screen active" id="screen-splash">
+        <div class="intro-bg">
+          <div class="intro-rings">
+            <div class="intro-ring ring1"></div>
+            <div class="intro-ring ring2"></div>
+            <div class="intro-ring ring3"></div>
+          </div>
+          <div class="intro-logo-wrap" id="intro-logo-wrap">
+            <img src="logo.png" alt="Takaro" class="intro-logo" id="intro-logo"/>
+          </div>
+          <p class="intro-tagline" id="intro-tagline">Kelola keuanganmu secara bijak</p>
+          <div class="intro-loader" id="intro-loader">
+            <div class="intro-loader-bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SCREEN: LOGIN ===== -->
+      <div class="screen" id="screen-login">
+        <div class="login-bg">
+          <div class="login-top">
+            <img src="logo-white-bg.png" alt="Takaro" class="login-logo-header"/>
+            <p class="login-sub" data-i18n="login_sub">Manajemen keuangan untuk generasi muda</p>
+          </div>
+          <div class="login-card">
+            <!-- Tab toggle -->
+            <div class="login-tabs">
+              <button class="login-tab active" id="tab-masuk" onclick="setLoginTab('masuk')" data-i18n="tab_login">Masuk</button>
+              <button class="login-tab" id="tab-daftar" onclick="setLoginTab('daftar')" data-i18n="tab_register">Daftar</button>
+            </div>
+            <!-- Login Error -->
+            <div class="login-error" id="login-error" style="display:none">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#EF4444" stroke-width="2"/><path d="M12 8v4m0 4h.01" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/></svg>
+              <span id="login-error-text"></span>
+            </div>
+            <!-- Login Form -->
+            <div id="form-masuk">
+              <div class="login-field">
+                <label class="login-label" data-i18n="label_email">Email / No. HP</label>
+                <div class="login-input-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#9CA3AF" stroke-width="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <input type="text" id="login-email" class="login-input" placeholder="Email atau no. HP"/>
+                </div>
+              </div>
+              <div class="login-field">
+                <label class="login-label">Password</label>
+                <div class="login-input-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#9CA3AF" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <input type="password" id="login-pass" class="login-input" placeholder="Masukkan password"/>
+                  <button class="eye-btn" onclick="togglePass('login-pass')" id="eye-login" title="Tampilkan"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#9CA3AF" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="#9CA3AF" stroke-width="1.8"/></svg></button>
+                </div>
+              </div>
+              <button class="login-forgot" onclick="navigate('screen-forgot-password')" data-i18n="forgot_password">Lupa password?</button>
+              <button class="btn-login" id="btn-login" onclick="doLogin()" data-i18n="btn_login">Masuk</button>
+            </div>
+            <!-- Register Form -->
+            <div id="form-daftar" style="display:none">
+              <div class="login-field">
+                <label class="login-label" data-i18n="label_fullname">Nama Lengkap</label>
+                <div class="login-input-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#9CA3AF" stroke-width="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <input type="text" id="reg-name" class="login-input" placeholder="Masukkan nama lengkap"/>
+                </div>
+              </div>
+              <div class="login-field">
+                <label class="login-label">Email</label>
+                <div class="login-input-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#9CA3AF" stroke-width="1.8"/><path d="M22 6l-10 7L2 6" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <input type="email" id="reg-email" class="login-input" placeholder="Email atau no. HP"/>
+                </div>
+              </div>
+              <div class="login-field">
+                <label class="login-label">Password</label>
+                <div class="login-input-wrap">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#9CA3AF" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  <input type="password" id="reg-pass" class="login-input" placeholder="Min. 8 karakter"/>
+                  <button class="eye-btn" onclick="togglePass('reg-pass')" title="Tampilkan"><svg id="eye-icon-reg" width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke="#9CA3AF" stroke-width="1.8"/><circle cx="12" cy="12" r="3" stroke="#9CA3AF" stroke-width="1.8"/></svg></button>
+                </div>
+              </div>
+              <button class="btn-login" id="btn-register" onclick="doRegister()" data-i18n="btn_register">Buat Akun</button>
+            </div>
+            <div class="login-divider"><span data-i18n="or_continue">atau lanjutkan dengan</span></div>
+            <button class="btn-google" id="btn-google" onclick="doGoogleLogin()">
+              <svg width="20" height="20" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+              </svg>
+              <span data-i18n="btn_google">Masuk dengan Google</span>
+            </button>
+            <button class="btn-guest" onclick="doGuestLogin()" data-i18n="btn_guest">Masuk sebagai Tamu</button>
+
+            <!-- Google Auth Modal -->
+            <div class="google-modal" id="google-modal">
+              <div class="google-modal-card" id="google-modal-card">
+                <div class="google-modal-header">
+                  <svg width="24" height="24" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                  <span data-i18n="google_title">Masuk dengan Google</span>
+                </div>
+                <p class="google-modal-desc" data-i18n="google_desc">Masukkan akun Google yang ingin kamu gunakan</p>
+                <div class="google-form">
+                  <!-- Google Login Error -->
+                  <div class="login-error" id="google-error" style="display:none">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#EF4444" stroke-width="2"/><path d="M12 8v4m0 4h.01" stroke="#EF4444" stroke-width="2" stroke-linecap="round"/></svg>
+                    <span id="google-error-text"></span>
+                  </div>
+                  <div class="login-field">
+                    <label class="login-label">Nama</label>
+                    <div class="login-input-wrap">
+                      <input type="text" id="google-name-input" class="login-input" placeholder="Nama lengkap"/>
+                    </div>
+                  </div>
+                  <div class="login-field">
+                    <label class="login-label">Email</label>
+                    <div class="login-input-wrap">
+                      <input type="email" id="google-email-input" class="login-input" placeholder="email@gmail.com"/>
+                    </div>
+                  </div>
+                  <button class="btn-login" onclick="submitGoogleForm()" style="margin-top:8px" data-i18n="btn_continue">Lanjutkan</button>
+                </div>
+                <button class="google-cancel" onclick="closeGoogleModal()" data-i18n="btn_cancel">Batal</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SCREEN: FORGOT PASSWORD ===== -->
+      <div class="screen" id="screen-forgot-password">
+        <div class="sub-header">
+          <button class="back-btn" onclick="navigate('screen-login')" id="btn-back-forgot">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="screen-title-white" data-i18n="forgot_title">Lupa Password</h2>
+          <div style="width:36px"></div>
+        </div>
+        <div class="forgot-body">
+          <div class="forgot-icon-wrap">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#1C3A6E" stroke-width="1.5"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#1C3A6E" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="16" r="1.5" fill="#1C3A6E"/></svg>
+          </div>
+          <p class="forgot-desc" data-i18n="forgot_desc">Masukkan email yang terdaftar untuk mereset password kamu.</p>
+          <div class="forgot-error" id="forgot-error" style="display:none">
+            <span id="forgot-error-text"></span>
+          </div>
+          <div class="forgot-success" id="forgot-success" style="display:none">
+            <span id="forgot-success-text"></span>
+          </div>
+          <!-- Step 1: Email -->
+          <div id="forgot-step1">
+            <div class="login-field">
+              <label class="login-label">Email</label>
+              <div class="login-input-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" stroke="#9CA3AF" stroke-width="1.8"/><path d="M22 6l-10 7L2 6" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input type="email" id="forgot-email" class="login-input" placeholder="Email terdaftar"/>
+              </div>
+            </div>
+            <button class="btn-login" onclick="forgotStep1()" data-i18n="btn_next">Selanjutnya</button>
+          </div>
+          <!-- Step 2: New Password -->
+          <div id="forgot-step2" style="display:none">
+            <div class="login-field">
+              <label class="login-label" data-i18n="label_new_pass">Password Baru</label>
+              <div class="login-input-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#9CA3AF" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input type="password" id="forgot-new-pass" class="login-input" placeholder="Min. 8 karakter"/>
+              </div>
+            </div>
+            <div class="login-field">
+              <label class="login-label" data-i18n="label_confirm_pass">Konfirmasi Password</label>
+              <div class="login-input-wrap">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><rect x="3" y="11" width="18" height="11" rx="2" stroke="#9CA3AF" stroke-width="1.8"/><path d="M7 11V7a5 5 0 0110 0v4" stroke="#9CA3AF" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <input type="password" id="forgot-confirm-pass" class="login-input" placeholder="Ulangi password"/>
+              </div>
+            </div>
+            <button class="btn-login" onclick="forgotStep2()" data-i18n="btn_reset">Reset Password</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SCREEN: HOME / DASHBOARD ===== -->
+      <div class="screen" id="screen-home">
+        <!-- Header -->
+        <div class="header-home">
+          <div class="header-user">
+            <div class="avatar">R</div>
+            <div>
+              <p class="greeting">Selamat Pagi</p>
+              <p class="username">Welcome Back, Rizky!</p>
+            </div>
+          </div>
+          <button class="icon-btn notif-btn" id="btn-notif" onclick="showNotifPanel()">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M15 17H9m10.5-2a2 2 0 01-2-2V10a5.5 5.5 0 00-11 0v3a2 2 0 01-2 2h15zm-7.5 4a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="notif-dot"></span>
+          </button>
+        </div>
+
+        <!-- Balance Card -->
+        <div class="balance-section">
+          <div class="balance-card">
+            <p class="balance-label" data-i18n="total_balance">Total Saldo</p>
+            <h1 class="balance-amount" id="total-balance">Rp 0</h1>
+            <div class="account-dots">
+              <span class="dot active" onclick="switchAccount(0)"></span>
+              <span class="dot" onclick="switchAccount(1)"></span>
+              <span class="dot" onclick="switchAccount(2)"></span>
+            </div>
+            <div class="income-outcome-row">
+              <div class="io-card income-card">
+                <div class="io-icon-wrap income-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 19V5m-7 7l7-7 7 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <p class="io-label" data-i18n="income">Pemasukan</p>
+                  <p class="io-amount income" id="total-income">Rp 0</p>
+                </div>
+              </div>
+              <div class="io-card outcome-card">
+                <div class="io-icon-wrap outcome-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 5v14m7-7l-7 7-7-7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <p class="io-label" data-i18n="expense">Pengeluaran</p>
+                  <p class="io-amount outcome" id="total-outcome">Rp 0</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="home-content">
+          <!-- Quick Actions -->
+          <div class="quick-actions">
+            <button class="qa-btn" id="btn-add-income" onclick="navigate('screen-add', 'income')">
+              <div class="qa-icon income-bg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14m7-7l-7 7-7-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 3h14" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+              <span data-i18n="income">Pemasukan</span>
+            </button>
+            <button class="qa-btn" id="btn-add-outcome" onclick="navigate('screen-add', 'outcome')">
+              <div class="qa-icon outcome-bg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 19V5m-7 7l7-7 7 7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 21h14" stroke="white" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+              <span data-i18n="expense">Pengeluaran</span>
+            </button>
+            <button class="qa-btn" id="btn-report" onclick="navigate('screen-report')">
+              <div class="qa-icon report-bg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="white" stroke-width="1.8"/><path d="M8 17v-5m4 5v-9m4 9v-3" stroke="white" stroke-width="2" stroke-linecap="round"/></svg></div>
+              <span data-i18n="report">Laporan</span>
+            </button>
+            <button class="qa-btn" id="btn-transfer" onclick="navigate('screen-accounts')">
+              <div class="qa-icon transfer-bg"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <span data-i18n="accounts">Akun</span>
+            </button>
+          </div>
+
+          <!-- Activity Overview -->
+          <div class="section-header">
+            <h3 class="section-title" data-i18n="recent_activity">Aktivitas Terkini</h3>
+            <div class="period-selector">
+              <button class="period-btn active" id="period-week" onclick="setPeriod('week', this)" data-i18n="weekly">Mingguan</button>
+              <button class="period-btn" id="period-month" onclick="setPeriod('month', this)" data-i18n="monthly">Bulanan</button>
+            </div>
+          </div>
+
+          <!-- Transaction List -->
+          <div class="transaction-list" id="home-transactions"></div>
+
+          <button class="see-all-btn" id="btn-see-all" onclick="navigate('screen-history')" data-i18n="see_all">Lihat Semua Transaksi &rarr;</button>
+
+          <!-- Budget Progress -->
+          <div class="section-header" style="margin-top: 20px;">
+            <h3 class="section-title" data-i18n="monthly_budget">Budget Bulanan</h3>
+            <button class="budget-add-btn" onclick="openBudgetModal()" title="Tambah Budget">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+            </button>
+          </div>
+          <div class="budget-cards" id="budget-cards"></div>
+
+          <div style="height: 90px;"></div>
+        </div>
+
+        <!-- Notification Panel -->
+        <div class="notif-panel" id="notif-panel">
+          <div class="notif-panel-header">
+            <h4 data-i18n="notifications">Notifikasi</h4>
+            <button onclick="hideNotifPanel()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+          </div>
+          <div id="notif-list"></div>
+        </div>
+        <div class="notif-overlay" id="notif-overlay" onclick="hideNotifPanel()"></div>
+      </div>
+
+      <!-- ===== SCREEN: ADD TRANSACTION ===== -->
+      <div class="screen" id="screen-add">
+        <div class="add-header">
+          <button class="back-btn" onclick="navigate('screen-home')" id="btn-back-add">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="screen-title-white" data-i18n="add_transaction">Tambah Transaksi</h2>
+          <div style="width:36px"></div>
+        </div>
+
+        <!-- Type Toggle -->
+        <div class="type-toggle-wrap">
+          <div class="type-toggle">
+            <button class="type-btn active" id="type-income" onclick="setType('income')" data-i18n="income">Pemasukan</button>
+            <button class="type-btn" id="type-outcome" onclick="setType('outcome')" data-i18n="expense">Pengeluaran</button>
+          </div>
+        </div>
+
+        <!-- Amount Input -->
+        <div class="amount-input-section">
+          <p class="amount-input-label" data-i18n="nominal">Nominal</p>
+          <div class="amount-display">
+            <span class="currency-prefix">Rp</span>
+            <input type="text" id="amount-input" class="amount-field" placeholder="0" inputmode="numeric" oninput="formatAmount(this)"/>
+          </div>
+          <div class="amount-underline"></div>
+        </div>
+
+        <!-- Form Fields -->
+        <div class="add-form-scroll">
+          <div class="form-field">
+            <label class="field-label" data-i18n="category">Kategori</label>
+            <div class="category-grid" id="category-grid"></div>
+          </div>
+
+          <div class="form-field">
+            <label class="field-label" for="add-desc" data-i18n="description">Keterangan</label>
+            <input type="text" id="add-desc" class="text-input" placeholder="Contoh: Makan siang, Kopi, dll." />
+          </div>
+
+          <div class="form-field">
+            <label class="field-label" for="add-date" data-i18n="date">Tanggal</label>
+            <input type="date" id="add-date" class="text-input" />
+          </div>
+
+          <div class="form-field">
+            <label class="field-label" for="add-account" data-i18n="account">Akun</label>
+            <select id="add-account" class="text-input select-input">
+              <option value="cash">💵 Cash</option>
+              <option value="bank">🏦 Bank BCA</option>
+              <option value="dompet">📱 Dompet Digital</option>
+            </select>
+          </div>
+
+          <button class="btn-save" id="btn-save-transaction" onclick="saveTransaction()" data-i18n="save_transaction">Simpan Transaksi</button>
+
+          <!-- Toast -->
+          <div class="toast" id="toast-success">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span data-i18n="toast_saved">Transaksi berhasil disimpan!</span>
+          </div>
+
+          <div style="height: 40px;"></div>
+        </div>
+      </div>
+
+      <!-- ===== SCREEN: HISTORY ===== -->
+      <div class="screen screen-no-nav" id="screen-history">
+        <div class="sub-header">
+          <button class="back-btn" onclick="navigate('screen-home')" id="btn-back-history">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="screen-title-white" data-i18n="transaction_history">Riwayat Transaksi</h2>
+          <button class="icon-btn" id="btn-filter-history" onclick="toggleFilter()">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M7 12h10M11 18h2" stroke="white" stroke-width="2" stroke-linecap="round"/></svg>
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-wrap">
+          <div class="search-bar">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="8" stroke="#9CA3AF" stroke-width="2"/><path d="M21 21l-4.35-4.35" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="text" id="search-input" class="search-input" placeholder="Cari transaksi..." oninput="filterHistory()" />
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" id="filter-bar" style="display:none">
+          <div class="filter-group">
+            <label class="filter-label" data-i18n="type">Tipe</label>
+            <div class="filter-pills">
+              <button class="filter-pill active" id="filter-all" onclick="setHistoryFilter('all', this)" data-i18n="all">Semua</button>
+              <button class="filter-pill" id="filter-income-btn" onclick="setHistoryFilter('income', this)" data-i18n="income">Pemasukan</button>
+              <button class="filter-pill" id="filter-outcome-btn" onclick="setHistoryFilter('outcome', this)" data-i18n="expense">Pengeluaran</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- History List -->
+        <div class="history-scroll">
+          <div id="history-list"></div>
+          <div style="height: 30px;"></div>
+        </div>
+
+        <!-- Edit Transaction Modal -->
+        <div class="edit-trx-modal" id="edit-trx-modal">
+          <div class="edit-trx-overlay" onclick="closeEditTrxModal()"></div>
+          <div class="edit-trx-card">
+            <div class="aa-header">
+              <h3 data-i18n="edit_transaction">Edit Transaksi</h3>
+              <button class="aa-close" onclick="closeEditTrxModal()">&times;</button>
+            </div>
+            <input type="hidden" id="edit-trx-id"/>
+            <label class="aa-label" data-i18n="description">Keterangan</label>
+            <input type="text" id="edit-trx-desc" class="aa-input" placeholder="Keterangan"/>
+            <label class="aa-label" data-i18n="nominal">Nominal</label>
+            <input type="number" id="edit-trx-amount" class="aa-input" placeholder="0" min="1"/>
+            <label class="aa-label" data-i18n="date">Tanggal</label>
+            <input type="date" id="edit-trx-date" class="aa-input"/>
+            <label class="aa-label" data-i18n="category">Kategori</label>
+            <select id="edit-trx-cat" class="aa-input"></select>
+            <div class="aa-actions">
+              <button class="aa-btn-cancel edit-trx-delete-btn" onclick="deleteTransaction()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <span data-i18n="delete">Hapus</span>
+              </button>
+              <button class="aa-btn-save" onclick="saveEditTransaction()" data-i18n="save">Simpan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SCREEN: REPORT ===== -->
+      <div class="screen screen-no-nav" id="screen-report">
+        <div class="sub-header">
+          <button class="back-btn" onclick="navigate('screen-home')" id="btn-back-report">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="screen-title-white" data-i18n="financial_report">Laporan Keuangan</h2>
+          <div style="width:36px"></div>
+        </div>
+
+        <!-- Period Toggle -->
+        <div class="report-period-wrap">
+          <div class="report-period-toggle">
+            <button class="report-period-btn active" id="rpt-income-btn" onclick="setReportView('income', this)" data-i18n="income">Pemasukan</button>
+            <button class="report-period-btn" id="rpt-outcome-btn" onclick="setReportView('outcome', this)" data-i18n="expense">Pengeluaran</button>
+          </div>
+        </div>
+
+        <div class="report-scroll">
+          <!-- Date Range -->
+          <div class="date-range-card">
+            <div class="date-range-item">
+              <p class="dr-label" data-i18n="from">Dari</p>
+              <input type="month" id="report-from" class="dr-input" onchange="updateReport()" />
+            </div>
+            <div class="dr-separator"></div>
+            <div class="date-range-item">
+              <p class="dr-label" data-i18n="to">Sampai</p>
+              <input type="month" id="report-to" class="dr-input" onchange="updateReport()" />
+            </div>
+          </div>
+
+          <!-- Donut Chart -->
+          <div class="donut-wrap">
+            <svg id="donut-chart" viewBox="0 0 200 200" width="180" height="180">
+              <circle cx="100" cy="100" r="70" fill="none" stroke="#F3F4F6" stroke-width="28"/>
+              <!-- Segments rendered by JS -->
+            </svg>
+            <div class="donut-center">
+              <p class="donut-total-label">Total</p>
+              <p class="donut-total" id="donut-total-text">Rp 0</p>
+            </div>
+          </div>
+
+          <!-- Legend -->
+          <div class="chart-legend" id="chart-legend"></div>
+
+          <!-- Transactions in period -->
+          <div class="section-header" style="margin: 16px 0 12px;">
+            <h3 class="section-title" style="font-size:14px;" data-i18n="transaction_detail">Detail Transaksi</h3>
+          </div>
+          <div id="report-transactions"></div>
+
+          <div style="height: 30px;"></div>
+        </div>
+      </div>
+
+      <!-- ===== SCREEN: ACCOUNTS ===== -->
+      <div class="screen" id="screen-accounts">
+        <div class="sub-header">
+          <button class="back-btn" onclick="navigate('screen-home')" id="btn-back-accounts">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="screen-title-white" data-i18n="multi_account">Multi Akun</h2>
+          <button class="add-account-btn" onclick="openAddAccountModal()" aria-label="Tambah akun">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+        <div class="accounts-scroll">
+          <div id="accounts-list"></div>
+          <div style="height: 30px;"></div>
+        </div>
+
+        <!-- Add Account Modal -->
+        <div class="aa-modal" id="aa-modal">
+          <div class="aa-overlay" onclick="closeAddAccountModal()"></div>
+          <div class="aa-card">
+            <div class="aa-header">
+              <h3 data-i18n="add_account">Tambah Akun</h3>
+              <button class="aa-close" onclick="closeAddAccountModal()" aria-label="Tutup">&times;</button>
+            </div>
+            <label class="aa-label" data-i18n="account_name">Nama Akun</label>
+            <input type="text" id="aa-name" class="aa-input" placeholder="Contoh: Bank Mandiri" maxlength="30" />
+            <label class="aa-label" data-i18n="account_type">Jenis Akun</label>
+            <select id="aa-type" class="aa-input">
+              <option value="Dompet Tunai">Dompet Tunai</option>
+              <option value="Rekening Bank">Rekening Bank</option>
+              <option value="Dompet Digital">Dompet Digital</option>
+              <option value="Kartu Kredit">Kartu Kredit</option>
+              <option value="Tabungan">Tabungan</option>
+              <option value="Investasi">Investasi</option>
+            </select>
+            <label class="aa-label" data-i18n="initial_balance">Saldo Awal</label>
+            <input type="number" id="aa-balance" class="aa-input" placeholder="0" min="0" />
+            <label class="aa-label" data-i18n="color">Warna</label>
+            <div class="aa-colors" id="aa-colors">
+              <button type="button" class="aa-color active" data-color="linear-gradient(135deg,#1B2F6B,#3B5BDB)" style="background:linear-gradient(135deg,#1B2F6B,#3B5BDB)"></button>
+              <button type="button" class="aa-color" data-color="linear-gradient(135deg,#0D5C8F,#1A7AB5)" style="background:linear-gradient(135deg,#0D5C8F,#1A7AB5)"></button>
+              <button type="button" class="aa-color" data-color="linear-gradient(135deg,#059669,#10B981)" style="background:linear-gradient(135deg,#059669,#10B981)"></button>
+              <button type="button" class="aa-color" data-color="linear-gradient(135deg,#7C2D12,#EA580C)" style="background:linear-gradient(135deg,#7C2D12,#EA580C)"></button>
+              <button type="button" class="aa-color" data-color="linear-gradient(135deg,#6B21A8,#A855F7)" style="background:linear-gradient(135deg,#6B21A8,#A855F7)"></button>
+              <button type="button" class="aa-color" data-color="linear-gradient(135deg,#9F1239,#F43F5E)" style="background:linear-gradient(135deg,#9F1239,#F43F5E)"></button>
+            </div>
+            <div class="aa-actions">
+              <button class="aa-btn-cancel" onclick="closeAddAccountModal()" data-i18n="btn_cancel">Batal</button>
+              <button class="aa-btn-save" onclick="saveNewAccount()" data-i18n="save">Simpan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SCREEN: PROFILE ===== -->
+      <div class="screen" id="screen-profile">
+        <div class="profile-header">
+          <button class="profile-back-btn" onclick="navigate('screen-home')" id="btn-back-profile">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar">R</div>
+            <div class="profile-badge" id="profile-star">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill="white" stroke="white" stroke-width="1"/></svg>
+            </div>
+          </div>
+          <h2 class="profile-name">Rizky Pratama</h2>
+          <p class="profile-email">rizky@example.com</p>
+        </div>
+        <div class="profile-scroll">
+          <div class="profile-stats">
+            <div class="pstat">
+              <p class="pstat-val" id="pstat-transactions">0</p>
+              <p class="pstat-label" data-i18n="transactions">Transaksi</p>
+            </div>
+            <div class="pstat-divider"></div>
+            <div class="pstat">
+              <p class="pstat-val pstat-green" id="pstat-income">Rp 0</p>
+              <p class="pstat-label" data-i18n="income">Pemasukan</p>
+            </div>
+            <div class="pstat-divider"></div>
+            <div class="pstat">
+              <p class="pstat-val pstat-red" id="pstat-outcome">Rp 0</p>
+              <p class="pstat-label" data-i18n="expense">Pengeluaran</p>
+            </div>
+          </div>
+
+          <div class="menu-section">
+            <div class="menu-group">
+              <div class="menu-item" onclick="navigate('screen-edit-profile')">
+                <div class="menu-icon" style="background:#EEF2FF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="4" stroke="#6366F1" stroke-width="1.8"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" stroke="#6366F1" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <span data-i18n="edit_profile">Edit Profil</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="menu-item" onclick="navigate('screen-theme-settings')">
+                <div class="menu-icon" style="background:#F0F9FF"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="#0EA5E9" stroke-width="1.8"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="#0EA5E9" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <span data-i18n="appearance">Tampilan Aplikasi</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="menu-item" onclick="navigate('screen-language-settings')">
+                <div class="menu-icon" style="background:#FEF3C7"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9.5m2.636 6L5 19.5m4.048-4L3 9.5M21 12l-4.5 7.5L12 12" stroke="#D97706" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                <span data-i18n="language">Bahasa</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="menu-item" onclick="navigate('screen-notif-settings')">
+                 <div class="menu-icon" style="background:#FFF7ED"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 17H9m10.5-2a2 2 0 01-2-2V10a5.5 5.5 0 00-11 0v3a2 2 0 01-2 2h15zm-7.5 4a2 2 0 01-2-2h4a2 2 0 01-2 2z" stroke="#F97316" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                 <span data-i18n="notification_settings">Pengaturan Notifikasi</span>
+                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+               </div>
+            </div>
+            <div class="menu-group">
+              <div class="menu-item" onclick="doLogout()">
+                <div class="menu-icon" style="background:#FFF1F2"><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke="#EF4444" stroke-width="1.8" stroke-linecap="round"/></svg></div>
+                <span class="text-red" data-i18n="logout">Keluar</span>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <p class="app-version">Takaro v1.0.0 &middot; Kelola keuanganmu secara bijak</p>
+          <div style="height: 90px;"></div>
+        </div>
+      </div>
+
+      <!-- ═══════ EDIT PROFILE SCREEN ═══════ -->
+      <div class="screen" id="screen-edit-profile">
+        <div class="edit-profile-header">
+          <button class="edit-back-btn" onclick="navigate('screen-profile')">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="edit-title" data-i18n="edit_profile">Edit Profile</h2>
+          <span class="edit-header-spacer" aria-hidden="true"></span>
+          <div class="edit-avatar-wrap">
+            <div class="edit-avatar" id="edit-avatar">R</div>
+          </div>
+        </div>
+        <div class="edit-profile-body">
+          <p class="edit-change-pic" onclick="alert('Pilih gambar profil')">Change Picture</p>
+          <div class="edit-field">
+            <label>Username</label>
+            <input type="text" id="edit-username" placeholder="username" />
+          </div>
+          <div class="edit-field">
+            <label>Email</label>
+            <input type="email" id="edit-email" placeholder="Example@gmail.com" />
+          </div>
+          <div class="edit-field">
+            <label>Phone Number</label>
+            <input type="tel" id="edit-phone" placeholder="(+62)____" />
+          </div>
+          <div class="edit-field">
+            <label>Password</label>
+            <input type="password" id="edit-password" placeholder="••••••••" />
+          </div>
+          <button class="edit-update-btn" onclick="saveEditProfile()" data-i18n="save_changes">Simpan Perubahan</button>
+          <!-- Delete Account -->
+          <button class="delete-account-btn" onclick="deleteUserAccount()" data-i18n="delete_account">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            Hapus Akun
+          </button>
+        </div>
+      </div>
+
+      <!-- ============ SCREEN: THEME SETTINGS ============ -->
+      <div class="screen" id="screen-theme-settings">
+        <div class="notif-set-topbar">
+          <button class="notif-set-back" onclick="navigate('screen-profile')" aria-label="Kembali">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="notif-set-title" data-i18n="appearance">Tampilan Aplikasi</h2>
+        </div>
+        <div class="notif-set-body">
+          <p class="notif-set-section" data-i18n="select_theme">PILIH TEMA</p>
+          <div class="theme-options">
+            <div class="theme-option active" id="theme-light" onclick="setTheme('light')">
+              <div class="theme-preview theme-preview-light">
+                <div class="tp-header-bar"></div>
+                <div class="tp-content-bar"></div>
+                <div class="tp-content-bar short"></div>
+              </div>
+              <div class="theme-option-label">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <span data-i18n="light_mode">Light Mode</span>
+              </div>
+            </div>
+            <div class="theme-option" id="theme-dark" onclick="setTheme('dark')">
+              <div class="theme-preview theme-preview-dark">
+                <div class="tp-header-bar"></div>
+                <div class="tp-content-bar"></div>
+                <div class="tp-content-bar short"></div>
+              </div>
+              <div class="theme-option-label">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span data-i18n="dark_mode">Dark Mode</span>
+              </div>
+            </div>
+            <div class="theme-option" id="theme-system" onclick="setTheme('system')">
+              <div class="theme-preview theme-preview-system">
+                <div class="tp-header-bar"></div>
+                <div class="tp-content-bar"></div>
+                <div class="tp-content-bar short"></div>
+              </div>
+              <div class="theme-option-label">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 21h8m-4-4v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                <span data-i18n="system_mode">Ikuti Perangkat</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SCREEN: LANGUAGE SETTINGS ============ -->
+      <div class="screen" id="screen-language-settings">
+        <div class="notif-set-topbar">
+          <button class="notif-set-back" onclick="navigate('screen-profile')" aria-label="Kembali">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="notif-set-title" data-i18n="language">Bahasa</h2>
+        </div>
+        <div class="notif-set-body">
+          <p class="notif-set-section" data-i18n="select_language">PILIH BAHASA</p>
+          <div class="lang-options">
+            <div class="lang-option active" id="lang-id" onclick="setLanguage('id')">
+              <span class="lang-flag">🇮🇩</span>
+              <div class="lang-info">
+                <span class="lang-name">Bahasa Indonesia</span>
+                <span class="lang-native">Indonesian</span>
+              </div>
+              <div class="lang-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="lang-option" id="lang-en" onclick="setLanguage('en')">
+              <span class="lang-flag">🇬🇧</span>
+              <div class="lang-info">
+                <span class="lang-name">English</span>
+                <span class="lang-native">Inggris</span>
+              </div>
+              <div class="lang-check">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ SCREEN: NOTIFICATION SETTINGS ============ -->
+      <div class="screen" id="screen-notif-settings">
+        <div class="notif-set-topbar">
+          <button class="notif-set-back" onclick="navigate('screen-profile')" aria-label="Kembali">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="#0F172A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <h2 class="notif-set-title" data-i18n="notification_settings">Pengaturan Notifikasi</h2>
+        </div>
+
+        <div class="notif-set-body">
+          <p class="notif-set-section">REMINDER HARIAN</p>
+          <div class="notif-card">
+            <div class="notif-row">
+              <div class="notif-ico" style="background:#EEF2FF;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#4F46E5" stroke-width="1.8"/><path d="M3 9h18M8 3v4M16 3v4" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+              <div class="notif-text">
+                <div class="notif-name" data-i18n="daily_notif">Notifikasi Harian</div>
+                <div class="notif-desc" data-i18n="remind_daily">Ingatkan saya setiap hari pukul:</div>
+              </div>
+              <div id="notif-time-btn" class="notif-time-btn" title="Input manual">
+                <input type="time" id="notif-time-input" value="20:00" onchange="onNotifTimeInputChange(this.value)" oninput="onNotifTimeInputChange(this.value)" style="border:none;outline:none;background:transparent;font:inherit;font-weight:700;letter-spacing:1px;color:inherit;padding:0;width:64px;cursor:text;" />
+                <span onclick="openTimePicker()" title="Pilih dari kalender jam" style="display:inline-flex;align-items:center;margin-left:6px;padding-left:6px;border-left:1px solid #E5E7EB;cursor:pointer;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <p class="notif-set-section">MODE SENYAP</p>
+          <div class="notif-card">
+            <div class="notif-row">
+              <div class="notif-ico" style="background:#EEF2FF;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 4l16 16M9 5.5A3 3 0 0115 7v3m4 4.5V13a7 7 0 00-1.2-3.9M17 17H6l1.4-1.4A6 6 0 009 11" stroke="#4F46E5" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+              <div class="notif-text">
+                <div class="notif-name">Mode Senyap</div>
+                <div class="notif-desc">Nonaktifkan semua notifikasi sementara.</div>
+              </div>
+              <label class="notif-switch"><input type="checkbox" id="notif-silent"><span class="notif-slider"></span></label>
+            </div>
+          </div>
+
+          <p class="notif-set-section">TRANSAKSI</p>
+          <div class="notif-card">
+            <div class="notif-row">
+              <div class="notif-ico" style="background:#ECFDF5;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="12" rx="2" stroke="#10B981" stroke-width="1.8"/><circle cx="12" cy="12" r="2.4" stroke="#10B981" stroke-width="1.8"/></svg>
+              </div>
+              <div class="notif-text">
+                <div class="notif-name">Notifikasi Pemasukan</div>
+                <div class="notif-desc">Kabar saat dana masuk terdeteksi.</div>
+              </div>
+              <label class="notif-switch"><input type="checkbox" id="notif-income"><span class="notif-slider"></span></label>
+            </div>
+          </div>
+          <div class="notif-card" style="margin-top:10px;">
+            <div class="notif-row">
+              <div class="notif-ico" style="background:#FFF7ED;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 7h12l-1 13H7L6 7zM9 7V5a3 3 0 016 0v2" stroke="#F97316" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="notif-text">
+                <div class="notif-name">Notifikasi Pengeluaran</div>
+                <div class="notif-desc">Konfirmasi untuk setiap transaksi keluar.</div>
+              </div>
+              <label class="notif-switch"><input type="checkbox" id="notif-outcome"><span class="notif-slider"></span></label>
+            </div>
+          </div>
+
+          <button class="notif-save-btn" onclick="saveNotifSettings()" data-i18n="save_changes">Simpan Perubahan</button>
+          <div style="height:24px;"></div>
+        </div>
+      </div>
+
+      <!-- ===== BUDGET MODAL ===== -->
+      <div class="aa-modal" id="budget-modal">
+        <div class="aa-overlay" onclick="closeBudgetModal()"></div>
+        <div class="aa-card">
+          <div class="aa-header">
+            <h3 data-i18n="add_budget">Tambah Budget</h3>
+            <button class="aa-close" onclick="closeBudgetModal()">&times;</button>
+          </div>
+          <label class="aa-label" data-i18n="category">Kategori</label>
+          <select id="budget-cat" class="aa-input"></select>
+          <label class="aa-label" data-i18n="budget_limit">Batas Budget (Rp)</label>
+          <input type="number" id="budget-limit" class="aa-input" placeholder="500000" min="1000"/>
+          <div class="aa-actions">
+            <button class="aa-btn-cancel" onclick="closeBudgetModal()" data-i18n="btn_cancel">Batal</button>
+            <button class="aa-btn-save" onclick="saveBudget()" data-i18n="save">Simpan</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Picker Modal -->
+      <div class="tp-overlay" id="tp-overlay" onclick="closeTimePicker()"></div>
+      <div class="tp-modal" id="tp-modal" role="dialog" aria-modal="true">
+        <div class="tp-head">
+          <span id="tp-period">Pagi</span>
+        </div>
+        <div class="tp-grid">
+          <div class="tp-wheel" id="tp-wheel-h"><div class="tp-wheel-inner" id="tp-wheel-h-inner"></div></div>
+          <span class="tp-sep">:</span>
+          <div class="tp-wheel" id="tp-wheel-m"><div class="tp-wheel-inner" id="tp-wheel-m-inner"></div></div>
+        </div>
+        <div class="tp-foot">
+          <button type="button" class="tp-link" onclick="closeTimePicker()">Batal</button>
+          <button type="button" class="tp-link" onclick="confirmTimePicker()" style="font-weight:700">Pilih</button>
+        </div>
+      </div>
+
+      <!-- ===== GLOBAL BOTTOM NAV (Material 3 Animated) ===== -->
+      <nav class="bottom-nav m3-nav" id="main-nav">
+        <button class="m3-nav-item active" id="nav-home" onclick="navTo('home')">
+          <div class="m3-nav-icon-wrap">
+            <div class="m3-nav-pill"></div>
+            <svg class="m3-nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="m3-nav-label" data-i18n="nav_home">Dashboard</span>
+        </button>
+        <button class="m3-nav-item" id="nav-history" onclick="navTo('history')">
+          <div class="m3-nav-icon-wrap">
+            <div class="m3-nav-pill"></div>
+            <svg class="m3-nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="m3-nav-label" data-i18n="nav_history">Riwayat</span>
+        </button>
+        <button class="m3-nav-item m3-nav-center" id="nav-add" onclick="navigate('screen-add')">
+          <div class="m3-nav-fab">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="white" stroke-width="2.5" stroke-linecap="round"/></svg>
+          </div>
+        </button>
+        <button class="m3-nav-item" id="nav-report" onclick="navTo('report')">
+          <div class="m3-nav-icon-wrap">
+            <div class="m3-nav-pill"></div>
+            <svg class="m3-nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 17v-5m4 5v-9m4 9v-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+          </div>
+          <span class="m3-nav-label" data-i18n="nav_report">Laporan</span>
+        </button>
+        <button class="m3-nav-item" id="nav-profile" onclick="navTo('profile')">
+          <div class="m3-nav-icon-wrap">
+            <div class="m3-nav-pill"></div>
+            <svg class="m3-nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="1.8"/></svg>
+          </div>
+          <span class="m3-nav-label" data-i18n="nav_profile">Profil</span>
+        </button>
+      </nav>
+
+    </div><!-- /phone-frame -->
+  </div><!-- /phone-wrapper -->
+
+  <script src="db.js" defer></script>
+  <script src="app.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    }
+  </script>
+
+</body>
+</html>
