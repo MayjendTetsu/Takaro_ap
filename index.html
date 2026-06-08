@@ -823,6 +823,28 @@
       </div>
 
       <!-- ===== BUDGET MODAL ===== -->
+      <div class="modal-overlay" id="budget-action-modal">
+        <div class="modal-sheet">
+          <div class="modal-handle"></div>
+
+          <h3 style="margin-bottom:16px">Kelola Budget</h3>
+
+          <button class="budget-action-btn"
+                  onclick="editBudget(selectedBudgetIndex)">
+            ✏️ Edit Budget
+          </button>
+
+          <button class="budget-action-btn delete"
+                  onclick="deleteBudget(selectedBudgetIndex)">
+            🗑 Hapus Budget
+          </button>
+
+          <button class="budget-action-btn cancel"
+                  onclick="closeBudgetActionModal()">
+            Batal
+          </button>
+        </div>
+      </div>
       <div class="aa-modal" id="budget-modal">
         <div class="aa-overlay" onclick="closeBudgetModal()"></div>
         <div class="aa-card">

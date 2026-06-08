@@ -595,3 +595,48 @@ body{background:#0F172A;display:flex;justify-content:center;align-items:center;m
 .budget-menu button:hover{
   background:#F3F4F6;
 }
+.budget-action-btn{
+  width:100%;
+  padding:14px 16px;
+  border:none;
+  background:white;
+  text-align:left;
+  font-size:15px;
+  font-weight:500;
+  border-radius:12px;
+  margin-bottom:8px;
+  cursor:pointer;
+}
+
+.budget-action-btn:active{
+  transform:scale(.98);
+}
+
+.budget-action-btn.delete{
+  color:#EF4444;
+}
+
+.budget-action-btn.cancel{
+  text-align:center;
+  color:#6B7280;
+}
+
+.modal-overlay{
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:flex-end;
+  z-index:999;
+}
+
+.modal-overlay.open{
+  display:flex;
+}
+
+.modal-sheet{
+  width:100%;
+  background:white;
+  border-radius:24px 24px 0 0;
+  padding:20px;
+}

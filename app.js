@@ -356,18 +356,19 @@ function renderBudgets() {
   }).join('');
 }
 
+let selectedBudgetIndex = null;
+
 function showBudgetMenu(idx) {
-  const pilihan = prompt(
-    "Kelola Budget\n\n1. Edit Budget\n2. Hapus Budget"
-  );
+  selectedBudgetIndex = idx;
 
-  if (pilihan === "1") {
-    editBudget(idx);
-  }
-
-  if (pilihan === "2") {
-    deleteBudget(idx);
-  }
+  document
+    .getElementById('budget-action-modal')
+    .classList.add('open');
+}
+function closeBudgetActionModal() {
+  document
+    .getElementById('budget-action-modal')
+    .classList.remove('open');
 }
 
 function openBudgetModal() {
@@ -400,6 +401,7 @@ function deleteBudget(idx) {
   if (!confirm('Hapus budget ini?')) return;
   BUDGETS.splice(idx, 1);
   saveBudgets();
+  closeBudgetActionModal();
   renderBudgets();
 }
 
