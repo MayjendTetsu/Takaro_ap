@@ -256,7 +256,11 @@ function navigate(id, param) {
     el.classList.add('active');
     currentScreen = id;
     if (id === 'screen-home')         renderHome();
-    if (id === 'screen-add')          setupAdd(param);
+    if (id === 'screen-add') {
+      setupAdd(param);
+      currentType = param || 'outcome';
+      renderCategoryGrid();
+    }
     if (id === 'screen-history')      renderHistory();
     if (id === 'screen-report')       renderReport();
     if (id === 'screen-accounts')     renderAccounts();
@@ -371,6 +375,12 @@ function editBudget(idx) {
 
   const budget = BUDGETS[idx];
 
+  const sel = document.getElementById('budget-cat');
+
+  sel.innerHTML = CATS_OUTCOME.map(
+    c => `<option value="${c.id}">${c.emoji} ${c.label}</option>`
+  ).join('');
+
   document.getElementById('budget-limit').value = budget.limit;
 
   const cat = CATS_OUTCOME.find(
@@ -378,7 +388,7 @@ function editBudget(idx) {
   );
 
   if (cat) {
-    document.getElementById('budget-cat').value = cat.id;
+    sel.value = cat.id;
   }
 
   closeBudgetActionModal();
@@ -386,11 +396,6 @@ function editBudget(idx) {
   document
     .getElementById('budget-modal')
     .classList.add('open');
-}
-function closeBudgetActionModal() {
-  document
-    .getElementById('budget-action-modal')
-    .classList.remove('open');
 }
 
 function openBudgetModal() {
