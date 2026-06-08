@@ -345,24 +345,7 @@ function renderBudgets() {
     const spent = transactions.filter(t=>t.type==='outcome'&&t.cat===b.cat.toLowerCase()).reduce((s,t)=>s+t.amount,0);
     const pct = b.limit > 0 ? Math.min(100, Math.round(spent/b.limit*100)) : 0;
     const barColor = pct >= 90 ? '#EF4444' : pct >= 70 ? '#F59E0B' : b.color;
-    return `<div class="budget-item">
-      <button class="budget-menu-btn" onclick="toggleBudgetMenu(event, ${idx})">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <circle cx="12" cy="5" r="2" fill="currentColor"/>
-          <circle cx="12" cy="12" r="2" fill="currentColor"/>
-          <circle cx="12" cy="19" r="2" fill="currentColor"/>
-        </svg>
-      </button>
-
-      <div class="budget-menu" id="budget-menu-${idx}">
-        <button onclick="editBudget(${idx})">
-          ✏️ Edit
-        </button>
-
-        <button onclick="deleteBudget(${idx})">
-          🗑 Hapus
-        </button>
-      </div>
+    return `<div class="budget-item" onclick="showBudgetMenu(${idx})">
       <div class="budget-top">
         <span class="budget-cat">${b.emoji} ${b.cat}</span>
         <span class="budget-pct" style="color:${barColor}">${pct}%</span>
@@ -372,17 +355,18 @@ function renderBudgets() {
     </div>`;
   }).join('');
 }
-function toggleBudgetMenu(event, idx) {
-  event.stopPropagation();
 
-  document.querySelectorAll('.budget-menu').forEach(menu => {
-    menu.classList.remove('show');
-  });
+function showBudgetMenu(idx) {
+  const pilihan = prompt(
+    "Kelola Budget\n\n1. Edit Budget\n2. Hapus Budget"
+  );
 
-  const menu = document.getElementById(`budget-menu-${idx}`);
+  if (pilihan === "1") {
+    editBudget(idx);
+  }
 
-  if (menu) {
-    menu.classList.toggle('show');
+  if (pilihan === "2") {
+    deleteBudget(idx);
   }
 }
 
