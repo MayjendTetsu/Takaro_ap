@@ -683,3 +683,11 @@ body{background:#0F172A;display:flex;justify-content:center;align-items:center;m
     transform:translateY(0);
   }
 }
+.m3-nav{
+  opacity:0;
+  transition:opacity .2s;
+}
+
+.m3-nav.nav-ready{
+  opacity:1;
+}

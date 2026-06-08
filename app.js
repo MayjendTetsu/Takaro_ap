@@ -1339,3 +1339,7 @@ document.addEventListener('click', () => {
     menu.classList.remove('show');
   });
 });
+window.addEventListener("load", () => {
+  document.getElementById("main-nav")
+    ?.classList.add("nav-ready");
+});
