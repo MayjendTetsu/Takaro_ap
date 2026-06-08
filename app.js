@@ -357,12 +357,34 @@ function renderBudgets() {
 }
 
 let selectedBudgetIndex = null;
+let editingBudgetIndex = null;
 
 function showBudgetMenu(idx) {
   selectedBudgetIndex = idx;
 
   document
     .getElementById('budget-action-modal')
+    .classList.add('open');
+}
+function editBudget(idx) {
+  editingBudgetIndex = idx;
+
+  const budget = BUDGETS[idx];
+
+  document.getElementById('budget-limit').value = budget.limit;
+
+  const cat = CATS_OUTCOME.find(
+    c => c.label === budget.cat
+  );
+
+  if (cat) {
+    document.getElementById('budget-cat').value = cat.id;
+  }
+
+  closeBudgetActionModal();
+
+  document
+    .getElementById('budget-modal')
     .classList.add('open');
 }
 function closeBudgetActionModal() {
@@ -380,28 +402,62 @@ function openBudgetModal() {
 function closeBudgetModal() {
   document.getElementById('budget-modal').classList.remove('open');
 }
+
 function saveBudget() {
   const catId = document.getElementById('budget-cat').value;
   const limit = parseInt(document.getElementById('budget-limit').value) || 0;
-  if (limit < 1000) { alert('Minimal budget Rp 1.000!'); return; }
-  const cat = CATS_OUTCOME.find(c => c.id === catId);
-  if (!cat) return;
-  // Check if budget for this category already exists
-  const existing = BUDGETS.findIndex(b => b.cat.toLowerCase() === catId);
-  if (existing >= 0) {
-    BUDGETS[existing].limit = limit;
-  } else {
-    BUDGETS.push({ cat: cat.label, emoji: cat.emoji, limit, color: '#22C55E' });
+
+  if (limit < 1000) {
+    alert('Minimal budget Rp 1.000!');
+    return;
   }
+
+  const cat = CATS_OUTCOME.find(c => c.id === catId);
+
+  if (!cat) return;
+
+  if (editingBudgetIndex !== null) {
+
+    BUDGETS[editingBudgetIndex] = {
+      cat: cat.label,
+      emoji: cat.emoji,
+      limit,
+      color: '#22C55E'
+    };
+
+    editingBudgetIndex = null;
+
+  } else {
+
+    const existing = BUDGETS.findIndex(
+      b => b.cat.toLowerCase() === catId
+    );
+
+    if (existing >= 0) {
+      BUDGETS[existing].limit = limit;
+    } else {
+      BUDGETS.push({
+        cat: cat.label,
+        emoji: cat.emoji,
+        limit,
+        color: '#22C55E'
+      });
+    }
+  }
+
   saveBudgets();
+
   closeBudgetModal();
+
   renderBudgets();
 }
 function deleteBudget(idx) {
-  if (!confirm('Hapus budget ini?')) return;
   BUDGETS.splice(idx, 1);
+
   saveBudgets();
+
   closeBudgetActionModal();
+
   renderBudgets();
 }
 
