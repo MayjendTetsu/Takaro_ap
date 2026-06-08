@@ -346,9 +346,23 @@ function renderBudgets() {
     const pct = b.limit > 0 ? Math.min(100, Math.round(spent/b.limit*100)) : 0;
     const barColor = pct >= 90 ? '#EF4444' : pct >= 70 ? '#F59E0B' : b.color;
     return `<div class="budget-item">
-      <button class="budget-delete-btn" onclick="deleteBudget(${idx})" title="Hapus">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <button class="budget-menu-btn" onclick="toggleBudgetMenu(event, ${idx})">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <circle cx="12" cy="5" r="2" fill="currentColor"/>
+          <circle cx="12" cy="12" r="2" fill="currentColor"/>
+          <circle cx="12" cy="19" r="2" fill="currentColor"/>
+        </svg>
       </button>
+
+      <div class="budget-menu" id="budget-menu-${idx}">
+        <button onclick="editBudget(${idx})">
+          ✏️ Edit
+        </button>
+
+        <button onclick="deleteBudget(${idx})">
+          🗑 Hapus
+        </button>
+      </div>
       <div class="budget-top">
         <span class="budget-cat">${b.emoji} ${b.cat}</span>
         <span class="budget-pct" style="color:${barColor}">${pct}%</span>
@@ -357,6 +371,19 @@ function renderBudgets() {
       <p class="budget-sub">${fmt(spent)} dari ${fmt(b.limit)}</p>
     </div>`;
   }).join('');
+}
+function toggleBudgetMenu(event, idx) {
+  event.stopPropagation();
+
+  document.querySelectorAll('.budget-menu').forEach(menu => {
+    menu.classList.remove('show');
+  });
+
+  const menu = document.getElementById(`budget-menu-${idx}`);
+
+  if (menu) {
+    menu.classList.toggle('show');
+  }
 }
 
 function openBudgetModal() {
@@ -1265,3 +1292,8 @@ function saveNewAccount() {
   closeAddAccountModal();
   if (typeof renderAccounts === 'function') renderAccounts();
 }
+document.addEventListener('click', () => {
+  document.querySelectorAll('.budget-menu').forEach(menu => {
+    menu.classList.remove('show');
+  });
+});
