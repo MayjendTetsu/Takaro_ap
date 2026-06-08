@@ -624,10 +624,10 @@ body{background:#0F172A;display:flex;justify-content:center;align-items:center;m
 .modal-overlay{
   position:absolute;
   inset:0;
-  background:rgba(0,0,0,.4);
+  background:rgba(0,0,0,.45);
   display:none;
   align-items:flex-end;
-  z-index:999;
+  z-index:9999;
 }
 
 .modal-overlay.open{
@@ -639,4 +639,47 @@ body{background:#0F172A;display:flex;justify-content:center;align-items:center;m
   background:white;
   border-radius:24px 24px 0 0;
   padding:20px;
+  animation:slideUp .25s ease;
+}
+
+.budget-action-btn{
+  width:100%;
+  padding:14px 16px;
+  border:none;
+  background:white;
+  text-align:left;
+  font-size:15px;
+  border-radius:12px;
+  margin-bottom:8px;
+  cursor:pointer;
+}
+
+.budget-action-btn:hover{
+  background:#F3F4F6;
+}
+
+.budget-action-btn.delete{
+  color:#EF4444;
+}
+
+.budget-action-btn.cancel{
+  text-align:center;
+  color:#6B7280;
+}
+
+.modal-handle{
+  width:40px;
+  height:4px;
+  background:#D1D5DB;
+  border-radius:999px;
+  margin:0 auto 16px;
+}
+
+@keyframes slideUp{
+  from{
+    transform:translateY(100%);
+  }
+  to{
+    transform:translateY(0);
+  }
 }
